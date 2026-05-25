@@ -371,7 +371,7 @@ tr:last-child td{border-bottom:0}
   </div>
 
 
- 
+  <div class="maker-footer">로얄로더 비중법사 만듦</div>
 </section>
 </main>
 
@@ -418,6 +418,17 @@ function applyInput(input){
   input.addEventListener("focus",()=>setTimeout(()=>input.select(),0));
   input.addEventListener("click",()=>input.select());
 
+  // 모바일: 입력할 때마다 실시간 계산
+  input.addEventListener("input",()=>{
+    updateAll();
+  });
+
+  // 모바일: 포커스 잃을 때 콤마 포맷 적용 + 계산
+  input.addEventListener("blur",()=>{
+    applyInput(input);
+  });
+
+  // PC: 엔터키로 계산
   input.addEventListener("keydown",(event)=>{
     if(event.key==="Enter"){
       event.preventDefault();
