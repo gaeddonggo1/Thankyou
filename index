@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>땡큐 & 싸미 반등폭 계산기 - HTS / MTS 실전형</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#0f1720;
+  --panel:#151f2b;
+  --panel2:#101820;
+  --line:#334155;
+  --line-strong:#64748b;
+  --text:#e8edf3;
+  --muted:#9aa8b8;
+  --red:#ff4b4b;
+  --blue:#38a3ff;
+  --yellow:#ffd84d;
+  --green:#8ee08e;
+  --cyan:#7dd3fc;
+}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:"Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;
+  background:linear-gradient(135deg,#08111c 0%,#111827 45%,#0b1220 100%);
+  color:var(--text);
+  display:flex;
+  justify-content:space-between;
+  padding:28px 14px;
+}
+.wrap{width:100%;max-width:850px}
+.calculator{
+  width:100%;
+  border:1px solid var(--line-strong);
+  background:var(--panel);
+  box-shadow:0 18px 40px rgba(0,0,0,.38);
+}
+.topbar{
+  height:50px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 18px;
+  background:linear-gradient(180deg,#253244,#182231);
+  border-bottom:1px solid var(--line-strong);
+}
+.title{
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:-.5px;
+}
+.badge{
+  font-size:12px;
+  font-weight:800;
+  color:#07111c;
+  background:var(--cyan);
+  padding:5px 9px;
+  border-radius:999px;
+}
+.main-grid{
+  display:grid;
+  grid-template-columns:28% 34% 38%;
+}
+.input-panel{
+  background:#0f1720;
+  border-right:1px solid var(--line-strong);
+}
+.input-block{
+  min-height:143px;
+  border-bottom:1px solid var(--line-strong);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:18px;
+}
+.input-block:last-child{border-bottom:0}
+.input-label{
+  font-size:15px;
+  font-weight:900;
+  margin-bottom:14px;
+  letter-spacing:-.4px;
+}
+.high-label{color:var(--red)}
+.low-label{color:var(--blue)}
+.price-input{
+  width:100%;
+  height:54px;
+  border:1px solid var(--line);
+  outline:none;
+  border-radius:8px;
+  background:#08111c;
+  text-align:center;
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:.5px;
+  padding:0 8px;
+}
+.price-input:focus{
+  border-color:#dbeafe;
+  box-shadow:0 0 0 3px rgba(125,211,252,.14);
+}
+#highPrice{color:var(--red)}
+#lowPrice{color:var(--blue)}
+.table-wrap{background:var(--panel2)}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+td{
+  height:38px;
+  padding:0 12px;
+  font-size:18px;
+  font-weight:900;
+  vertical-align:middle;
+  white-space:nowrap;
+  border-bottom:1px solid var(--line);
+}
+tr:last-child td{border-bottom:0}
+.left-results{border-right:1px solid var(--line-strong)}
+.name{
+  width:52%;
+  text-align:left;
+  padding-left:22px;
+  color:#d7dde5;
+}
+.value{
+  width:48%;
+  text-align:right;
+  padding-right:20px;
+  font-family:Consolas,"Malgun Gothic",monospace;
+  letter-spacing:.2px;
+  font-size:20px;
+}
+.thankyou td{background:#1f2733}
+.thankyou .name{color:var(--yellow)}
+.thankyou .value{color:#fff1a8}
+.ssami td{background:#182b27}
+.ssami .name{color:var(--green)}
+.ssami .value{color:#d8ffd8}
+.special td{background:#142637}
+.special .name{color:var(--cyan)}
+.special .value{color:#ccefff}
+.right-results td{background:#221936}
+.right-results .name{color:#d7c5ff}
+.right-results .value{color:#f2ebff}
+.section-line td{border-top:2px solid var(--line-strong)}
+.footer{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 16px;
+  border-top:1px solid var(--line-strong);
+  background:#0f1720;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+.footer strong{color:#e8edf3}
+
+.maker-footer{
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  padding:0 16px;
+  border-top:1px solid var(--line-strong);
+  background:#0f1720;
+  color:#9aa8b8;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:-.2px;
+}
+@media(max-width:760px){
+  body{
+    padding:10px;
+    align-items:flex-start;
+  }
+
+  .wrap{
+    max-width:100%;
+  }
+
+  .calculator{
+    border-radius:12px;
+    overflow:hidden;
+  }
+
+  .topbar{
+    height:auto;
+    min-height:56px;
+    gap:8px;
+    align-items:center;
+    flex-direction:row;
+    padding:12px 12px;
+  }
+
+  .title{
+    font-size:17px;
+    line-height:1.25;
+    letter-spacing:-.8px;
+  }
+
+  .badge{
+    font-size:11px;
+    padding:5px 8px;
+    flex-shrink:0;
+  }
+
+  .main-grid{
+    grid-template-columns:1fr;
+  }
+
+  .input-panel{
+    border-right:0;
+    border-bottom:1px solid var(--line-strong);
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .input-block{
+    min-height:108px;
+    padding:12px;
+    border-bottom:0;
+  }
+
+  .input-block:first-child{
+    border-right:1px solid var(--line-strong);
+  }
+
+  .input-label{
+    font-size:14px;
+    margin-bottom:10px;
+    text-align:center;
+  }
+
+  .price-input{
+    max-width:100%;
+    height:52px;
+    font-size:28px;
+    border-radius:10px;
+  }
+
+  .left-results{
+    border-right:0;
+    border-bottom:1px solid var(--line-strong);
+  }
+
+  td{
+    height:39px;
+    font-size:16px;
+    padding:0 10px;
+  }
+
+  .name{
+    padding-left:18px;
+  }
+
+  .value{
+    padding-right:18px;
+    font-size:20px;
+  }
+
+  .maker-footer{
+    height:36px;
+    justify-content:center;
+    font-size:12px;
+  }
+}
+
+@media(max-width:390px){
+  body{
+    padding:6px;
+  }
+
+  .title{
+    font-size:16px;
+  }
+
+  .badge{
+    font-size:10px;
+    padding:4px 7px;
+  }
+
+  .input-panel{
+    grid-template-columns:1fr;
+  }
+
+  .input-block:first-child{
+    border-right:0;
+    border-bottom:1px solid var(--line-strong);
+  }
+
+  .input-block{
+    min-height:96px;
+  }
+
+  .price-input{
+    height:50px;
+    font-size:27px;
+  }
+
+  td{
+    height:38px;
+    font-size:15px;
+  }
+
+  .value{
+    font-size:19px;
+  }
+}
+@media print{
+  body{background:#fff;padding:0}
+  .calculator{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="calculator">
+  <div class="topbar">
+    <div class="title">땡큐 &amp; 싸미 반등폭 계산기</div>
+    <div class="badge">HTS / MTS 실전형</div>
+  </div>
+
+  <div class="main-grid">
+    <div class="input-panel">
+      <div class="input-block">
+        <div class="input-label high-label">최고 가격 입력 ↓↓↓</div>
+        <input id="highPrice" class="price-input" type="text" inputmode="numeric" value="67,300">
+      </div>
+      <div class="input-block">
+        <div class="input-label low-label">최저 가격 입력 ↓↓↓</div>
+        <input id="lowPrice" class="price-input" type="text" inputmode="numeric" value="47,550">
+      </div>
+    </div>
+
+    <div class="table-wrap left-results">
+      <table>
+        <tbody>
+          <tr class="thankyou"><td class="name">땡큐 1타</td><td class="value" data-high="0.78"></td></tr>
+          <tr class="thankyou"><td class="name">땡큐 2타</td><td class="value" data-high="0.741"></td></tr>
+          <tr class="thankyou"><td class="name">땡큐 3타</td><td class="value" data-high="0.702"></td></tr>
+
+          <tr class="ssami section-line"><td class="name">싸미 1타</td><td class="value" data-high="0.67"></td></tr>
+          <tr class="ssami"><td class="name">싸미 2타</td><td class="value" data-high="0.6365"></td></tr>
+          <tr class="ssami"><td class="name">싸미 3타</td><td class="value" data-high="0.603"></td></tr>
+          <tr class="ssami"><td class="name">싸미 4타</td><td class="value" data-high="0.5695"></td></tr>
+
+          <tr class="special section-line"><td class="name">18반등</td><td class="value" data-range="0.18"></td></tr>
+          <tr class="special"><td class="name">25반등</td><td class="value" data-range="0.25"></td></tr>
+          <tr class="special"><td class="name">33반등</td><td class="value" data-range="0.33"></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-wrap">
+      <table class="right-results">
+        <tbody>
+          <tr><td class="name">2% 반등</td><td class="value" data-low="1.02"></td></tr>
+          <tr><td class="name">2.5% 반등</td><td class="value" data-low="1.025"></td></tr>
+          <tr><td class="name">3% 반등</td><td class="value" data-low="1.03"></td></tr>
+          <tr><td class="name">4% 반등</td><td class="value" data-low="1.04"></td></tr>
+          <tr><td class="name">5% 반등</td><td class="value" data-low="1.05"></td></tr>
+          <tr><td class="name">6% 반등</td><td class="value" data-low="1.06"></td></tr>
+          <tr><td class="name">7% 반등</td><td class="value" data-low="1.07"></td></tr>
+          <tr><td class="name">10% 반등</td><td class="value" data-low="1.10"></td></tr>
+          <tr><td class="name">12% 반등</td><td class="value" data-low="1.12"></td></tr>
+          <tr><td class="name">15% 반등</td><td class="value" data-low="1.15"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+ 
+</section>
+</main>
+
+<script>
+const highInput=document.getElementById("highPrice");
+const lowInput=document.getElementById("lowPrice");
+
+function onlyNumber(value){
+  return Number(String(value).replace(/[^0-9]/g,""))||0;
+}
+function comma(value){
+  return Math.round(value).toLocaleString("ko-KR");
+}
+function formatInput(input){
+  const number=onlyNumber(input.value);
+  input.value=number?number.toLocaleString("ko-KR"):"";
+}
+function updateAll(){
+  const high=onlyNumber(highInput.value);
+  const low=onlyNumber(lowInput.value);
+
+  document.querySelectorAll("[data-high]").forEach(cell=>{
+    const ratio=Number(cell.dataset.high);
+    cell.textContent=high?comma(high*ratio):"";
+  });
+
+  document.querySelectorAll("[data-low]").forEach(cell=>{
+    const ratio=Number(cell.dataset.low);
+    cell.textContent=low?comma(low*ratio):"";
+  });
+
+  document.querySelectorAll("[data-range]").forEach(cell=>{
+    const ratio=Number(cell.dataset.range);
+    cell.textContent=(high&&low)?comma(low+((high-low)*ratio)):"";
+  });
+}
+
+function applyInput(input){
+  formatInput(input);
+  updateAll();
+}
+
+[highInput, lowInput].forEach(input=>{
+  input.addEventListener("focus",()=>setTimeout(()=>input.select(),0));
+  input.addEventListener("click",()=>input.select());
+
+  input.addEventListener("keydown",(event)=>{
+    if(event.key==="Enter"){
+      event.preventDefault();
+      applyInput(input);
+
+      if(input === highInput){
+        lowInput.focus();
+      }else{
+        input.blur();
+      }
+    }
+  });
+});
+
+updateAll();
+</script>
+</body>
+</html>
